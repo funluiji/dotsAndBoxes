@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   creationComplete="onCreationCompleate(event)">
+	<fx:Script>
+		<![CDATA[
+			import com.ourguy.events.TurnEvent;
+			import com.ourguy.model.FieldModel;
+			import com.ourguy.util.Constants;
+			import com.ourguy.view.Field;
+			
+			import mx.events.FlexEvent;
+			private	var field:Field;
+			private	var fieldModel:FieldModel = new FieldModel();
+			
+			protected function onCreationCompleate(event:FlexEvent):void
+			{
+				field  = new Field();
+				field.x = 50;
+				field.y = 50;
+				
+				holder.addChild(field);
+				holder.addEventListener(TurnEvent.TURN_FINISHED,finishMove);
+			}
+			
+			protected function finishMove(event:TurnEvent):void
+			{
+				fieldModel.lineAdded(event.line);
+				Constants.turn = !Constants.turn;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:UIComponent id="holder"/>
+</s:WindowedApplication>
