@@ -1,6 +1,7 @@
 package com.ourguy.view
 {
 	import com.ourguy.events.TurnEvent;
+	import com.ourguy.model.LineModel;
 	import com.ourguy.util.Constants;
 	
 	import flash.display.Sprite;
@@ -8,28 +9,23 @@ package com.ourguy.view
 	
 	public class Line extends Sprite
 	{
-		
-		public var i:Number;
-		public var j:Number;
 		public var turn:Boolean;
-		public var isVertical:Boolean;
+		public var model:LineModel;		
+		
 		private var _w:Number;
 		private var _h:Number;
 		private var _color:int;
-		public var status:Object;
 		
 		public function Line(w:Number,h:Number,i:int,j:int,isVertical:Boolean)
 		{
 			super();
+			model = new LineModel(i, j, isVertical);
 			_w = w;
 			_h = h;
 			_color = 0x000000;
 			alpha = 0.5;
 			mouseChildren = false;
 			buttonMode = true;
-			this.i = i;
-			this.j = j;
-			this.isVertical = isVertical;
 			addEventListener(MouseEvent.CLICK,onClick);
 			draw();
 		}

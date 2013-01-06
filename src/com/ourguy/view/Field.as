@@ -2,7 +2,10 @@ package com.ourguy.view
 {
 	import com.ourguy.util.Constants;
 	
+	import flash.display.Shape;
 	import flash.display.Sprite;
+	
+	import mx.charts.renderers.CircleItemRenderer;
 	
 	public class Field extends Sprite
 	{
@@ -37,6 +40,13 @@ package com.ourguy.view
 				}
 			}
 			
+		}
+		public function	fillBoxUI(i:int,j:int,player:int):void
+		{
+			var circle:Shape = new Shape;
+			circle.graphics.beginFill(player==1?Constants.player1Color:Constants.player2Color,0.6);
+			circle.graphics.drawCircle(((j+0.5)*Constants.lineSize)+Constants.lineWidth*0.5,((i+0.5)*Constants.lineSize)+Constants.lineWidth*0.5,(Constants.lineSize-Constants.lineWidth*3)/2);
+			addChild(circle);
 		}
 	}
 }

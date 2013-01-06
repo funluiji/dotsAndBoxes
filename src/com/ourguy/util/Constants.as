@@ -11,8 +11,8 @@ package com.ourguy.util
 		public static var player2Color:int = 0x4452FB;
 		public static var turn:Boolean = false;
 		
-		public static const	BOX_RIGHT:int = 1;
-		public static const	BOX_DOWN:int = 10;
+		public static const	BOX_RIGHT:int = 10;
+		public static const	BOX_DOWN:int = 1;
 		public static const	BOX_UP:int = 100;
 		public static const	BOX_LEFT:int = 1000;
 		
