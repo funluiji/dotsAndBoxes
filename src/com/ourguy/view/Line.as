@@ -9,7 +9,6 @@ package com.ourguy.view
 	
 	public class Line extends Sprite
 	{
-		public var turn:Boolean;
 		public var model:LineModel;		
 		
 		private var _w:Number;
@@ -20,6 +19,7 @@ package com.ourguy.view
 		{
 			super();
 			model = new LineModel(i, j, isVertical);
+			this.name = String(i+"_"+j+"_"+isVertical);
 			_w = w;
 			_h = h;
 			_color = 0x000000;
@@ -30,16 +30,25 @@ package com.ourguy.view
 			draw();
 		}
 		
-		protected function onClick(event:MouseEvent):void
+		public function onClick(event:MouseEvent):void
 		{
 			removeEventListener(MouseEvent.CLICK,onClick);
 			buttonMode = false;
 			graphics.clear();
 			_color = Constants.playerColor;
 			alpha = 0.8;
-			turn = Constants.turn;
+			model.turn = Constants.turn;
 			draw();
 			dispatchEvent(new TurnEvent(TurnEvent.TURN_FINISHED, this));
+		}
+		public function drawBlack(event:MouseEvent):void
+		{
+			//removeEventListener(MouseEvent.CLICK,onClick);
+			//buttonMode = false;
+			graphics.clear();
+			_color = 0x000000;
+			alpha = 0.8;
+			draw();
 		}
 		
 		protected function draw():void

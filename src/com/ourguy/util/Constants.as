@@ -3,8 +3,8 @@ package com.ourguy.util
 	public class Constants
 	{
 		public static var dotSize:Number = 5;
-		public static var fieldRows:int = 5;
-		public static var fieldCols:int = 5;
+		public static var fieldRows:int = 3;
+		public static var fieldCols:int = 3;
 		public static var lineSize:int = 50;
 		public static var lineWidth:int = 5;
 		public static var player1Color:int = 0xD14153;

@@ -18,5 +18,16 @@ package com.ourguy.model
 				}
 			}
 		}
+		public function copy():FieldModel
+		{
+			var tempField:FieldModel = new FieldModel;
+			tempField.field = new Array();
+			for each(var item:Array in this.field)
+			{
+				tempField.field.push(item.concat());
+			}
+			return tempField;
+			
+		}
 	}
 }

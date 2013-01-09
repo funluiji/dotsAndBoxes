@@ -43,7 +43,7 @@ package com.ourguy.view
 		}
 		public function	fillBoxUI(i:int,j:int,player:int):void
 		{
-			var circle:Shape = new Shape;
+			var circle:Shape = new Shape();
 			circle.graphics.beginFill(player==1?Constants.player1Color:Constants.player2Color,0.6);
 			circle.graphics.drawCircle(((j+0.5)*Constants.lineSize)+Constants.lineWidth*0.5,((i+0.5)*Constants.lineSize)+Constants.lineWidth*0.5,(Constants.lineSize-Constants.lineWidth*3)/2);
 			addChild(circle);

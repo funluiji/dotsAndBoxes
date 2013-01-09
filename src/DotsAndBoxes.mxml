@@ -5,6 +5,7 @@
 					   creationComplete="onCreationCompleate(event)">
 	<fx:Script>
 		<![CDATA[
+			import com.ourguy.algo.AlgoUtils;
 			import com.ourguy.algo.AlphaBetaAlgorithm;
 			import com.ourguy.events.FilledBoxEvent;
 			import com.ourguy.events.TurnEvent;
@@ -18,7 +19,8 @@
 			private var checkedBox:Boolean = false;
 			private	var field:Field;
 			private	var fieldModel:FieldModel = new FieldModel();
-			
+			private	var algo:AlphaBetaAlgorithm = new AlphaBetaAlgorithm();
+			private static var iter:int = 0;
 			protected function onCreationCompleate(event:FlexEvent):void
 			{
 				field  = new Field();
@@ -32,12 +34,54 @@
 			protected function finishMove(event:TurnEvent):void
 			{
 				lineAdded(event.line);
+				//trace("added : ",event.line.model.i,event.line.model.j,event.line.model.isVertical);
 				if(checkedBox)
 				{
 					checkedBox = false
 				}else
 				{
 					Constants.turn = !Constants.turn;
+				}
+				iter++;
+				if(Constants.turn)
+				{
+					var emptyLines:Array = AlgoUtils.checkForEmptyLines(fieldModel);
+					algo.algorithm2(fieldModel,2,-161000,10000,Constants.turn,emptyLines);
+					var line:LineModel = algo.rightMove;
+					trace(line.i,line.j,line.isVertical);
+					//trace(algo.rightMove.i,algo.rightMove.j,algo.rightMove.isVertical);
+					//line.onClick(null);
+						//var line2:Line = field.getChildByName(String(line.i+"_"+line.j+"_"+line.isVertical)) as Line;
+						for( var i:int=0 ;i< field.numChildren;i++)
+						{
+							var child:Line;
+							if(field.getChildAt(i) is Line)
+							{
+								child = field.getChildAt(i) as Line;
+								if(child.model.j == line.j&&child.model.i == line.i&&child.model.isVertical == line.isVertical)
+								{
+									child.onClick(null);
+								}
+							}
+						}
+//					for each(var line:LineModel in emptyLines)
+//					{
+//						//var line2:Line = field.getChildByName(String(line.i+"_"+line.j+"_"+line.isVertical)) as Line;
+//						for( var i:int=0 ;i< field.numChildren;i++)
+//						{
+//							var child:Line;
+//							if(field.getChildAt(i) is Line)
+//							{
+//								child = field.getChildAt(i) as Line;
+//								if(child.model.j == line.j&&child.model.i == line.i&&child.model.isVertical == line.isVertical)
+//								{
+//									child.drawBlack(null);
+//								}
+//							}
+//						}
+//						trace(line.i,line.j,line.isVertical);
+//					}
+//					trace(emptyLines.length);
 				}
 			}
 			
@@ -47,15 +91,15 @@
 				{
 					if(line.model.isVertical)
 					{
-						fieldModel.field[line.model.i][line.model.j] += Constants.BOX_LEFT*(line.turn?2:1);
+						fieldModel.field[line.model.i][line.model.j] += Constants.BOX_LEFT*(line.model.turn?2:1);
 						
 					}else
 					{
-						fieldModel.field[line.model.i][line.model.j] += Constants.BOX_UP*(line.turn?2:1);
+						fieldModel.field[line.model.i][line.model.j] += Constants.BOX_UP*(line.model.turn?2:1);
 					}
 					if(isBoxFull(fieldModel.field[line.model.i][line.model.j]))
 					{
-						fieldModel.field[line.model.i][line.model.j] = -1*(line.turn?2:1);
+						fieldModel.field[line.model.i][line.model.j] = -1*(line.model.turn?2:1);
 						boxWasChecked(line.model.i,line.model.j,Math.abs(fieldModel.field[line.model.i][line.model.j]));
 					}
 				}
@@ -67,10 +111,10 @@
 				{
 					if(line.model.j>0)
 					{
-						fieldModel.field[line.model.i][line.model.j-1] += Constants.BOX_RIGHT*(line.turn?2:1);			
+						fieldModel.field[line.model.i][line.model.j-1] += Constants.BOX_RIGHT*(line.model.turn?2:1);			
 						if(isBoxFull(fieldModel.field[line.model.i][line.model.j-1]))
 						{
-							fieldModel.field[line.model.i][line.model.j-1] = -1*(line.turn?2:1);
+							fieldModel.field[line.model.i][line.model.j-1] = -1*(line.model.turn?2:1);
 							boxWasChecked(line.model.i,line.model.j-1,Math.abs(fieldModel.field[line.model.i][line.model.j-1]));
 						}
 					}
@@ -78,15 +122,14 @@
 				{
 					if(line.model.i>0)
 					{
-						fieldModel.field[line.model.i-1][line.model.j] += Constants.BOX_DOWN*(line.turn?2:1);
+						fieldModel.field[line.model.i-1][line.model.j] += Constants.BOX_DOWN*(line.model.turn?2:1);
 						if(isBoxFull(fieldModel.field[line.model.i-1][line.model.j]))
 						{
-							fieldModel.field[line.model.i-1][line.model.j] = -1*(line.turn?2:1);
+							fieldModel.field[line.model.i-1][line.model.j] = -1*(line.model.turn?2:1);
 							boxWasChecked(line.model.i-1,line.model.j,Math.abs(fieldModel.field[line.model.i-1][line.model.j]));
 						}
 					}
 				}
-				checkForEmptyLines();
 			}
 			
 			public function isBoxFull(box:int):Boolean
@@ -105,53 +148,9 @@
 				field.fillBoxUI(i,j,player);
 			}
 			
-			public function checkForEmptyLines():void
-			{
-				var emptyLines:Array = new Array();
-				for(var i:int = 0;i<Constants.fieldRows-1;i++)
-				{
-					for(var j:int = 0;j<Constants.fieldCols-1;j++)
-					{
-						if(fieldModel.field[i][j] >= 0)
-						{
-							emptyLines.push.apply( null, checkBoxForEmptyLines(i, j));		
-						}
-					}
-				}
-				trace("EMPTY LINES: ",emptyLines.length);
-			}
+
 			
-			public function checkBoxForEmptyLines(i:int, j:int):Array
-			{
-				var result:Array = new Array();
-				var tempLine:LineModel;
-				var box:int = fieldModel.field[i][j];
-				if(box<Constants.BOX_LEFT)
-				{
-					tempLine = new LineModel(i, j, true);
-					result.push(tempLine);
-				}
-				if((box %= Constants.BOX_LEFT)<Constants.BOX_UP)
-				{
-					tempLine = new LineModel(i, j, false);
-					result.push(tempLine);
-				}
-				
-				if(j == Constants.fieldCols-2 && ((box %= Constants.BOX_UP)<Constants.BOX_RIGHT))
-				{
-					tempLine = new LineModel(i+1,j,true);
-					result.push(tempLine);
-					
-				}
-				if(i == Constants.fieldRows-2 && ((box %= Constants.BOX_RIGHT)<Constants.BOX_DOWN))
-				{
-					tempLine = new LineModel(i,j+1,false);
-					result.push(tempLine);
-				}
-				
-				trace ("box",fieldModel.field[i][j],i,j,result.length, AlphaBetaAlgorithm.evaluate(fieldModel));
-				return result;
-			}
+			
 			
 			
 		]]>
