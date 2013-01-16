@@ -47,7 +47,7 @@ package com.ourguy.algo
 			if(depth == 0)
 			{
 //				/trace("Evaluate:",evaluate(fieldModel), moves.length)
-				return evaluate(fieldModel);
+				return evaluate(fieldModel,turn);
 			}
 			if(turn)
 			{
@@ -97,30 +97,37 @@ package com.ourguy.algo
 			var i:int;
 			var forLenght:int = moves.length;
 			var eval:int;
-			if(depth == 0)
+			if(depth == 0||forLenght==0)
 			{
-				return evaluate(fieldModel);
+				return evaluate(fieldModel,turn);
 			}
+			
+//			if(!fieldHasPotentialCheckboxes(fieldModel))
+//			{
+//				return evaluate(fieldModel);
+//			}
+			
 			var oldTurn:Boolean = turn;
 			for(i=0;i<forLenght; i++)
 			{
-				move = moves.shift();//TBD: MAKE MOVE
+				move = moves[0];
+				moves.splice(0,1);
 				algoField = lineAdded(move,fieldModel.copy());
 				if(checkedBox)
 				{
 					checkedBox = false;
+					eval = algorithm2(algoField, depth-1,alpha,beta,turn,moves.concat());
 				}else
 				{
-					turn = !turn;
+					eval = algorithm2(algoField, depth-1,alpha,beta,!turn,moves.concat());
 				}
-				eval = algorithm2(algoField, depth-1,alpha,beta,turn,moves);
 				if(oldTurn)
 				{
 					if(eval>alpha)
 					{
-						alpha = eval
+						alpha  = eval;
+						if(depth == Constants.ALGO_DEPTH)
 						rightMove=move;
-						trace("BEST MOVE",turn,move.i,move.j,move.isVertical,alpha);
 					}
 				}else
 				{
@@ -129,13 +136,15 @@ package com.ourguy.algo
 						beta = eval
 					}
 				}
+				if(depth == Constants.ALGO_DEPTH)
+					trace("BEST MOVE",turn,move.i,move.j,move.isVertical,alpha);
 				//trace("evaluating",depth,alpha,beta,turn,oldTurn)
+				moves.push(move);
+				checkedBox = false;
 				if(beta<=alpha)
 				{
-					moves.push(move);
 					break;
 				}
-				moves.push(move);
 			}
 			if(oldTurn) return alpha;
 			else return beta;
@@ -198,7 +207,7 @@ package com.ourguy.algo
 			return false;
 		}
 		
-		public function evaluate(fieldModel:FieldModel):int
+		public function evaluate(fieldModel:FieldModel,turn:Boolean):int
 		{
 			var player:int = 0;
 			var computer:int = 0;
@@ -229,8 +238,8 @@ package com.ourguy.algo
 				}
 			}
 			//trace((computer*8 - player*8 -(3*s3+2*s2)));
-			return computer*8 - player*8-(3*s3)//+2*s2);
-		}
-		
+			var multiply:int = turn?1:-1;
+			return (player*8 - computer*8 +multiply*(3*s3));//+2*s2));
+		}		
 	}
 }

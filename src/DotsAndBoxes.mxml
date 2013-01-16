@@ -21,6 +21,8 @@
 			private	var fieldModel:FieldModel = new FieldModel();
 			private	var algo:AlphaBetaAlgorithm = new AlphaBetaAlgorithm();
 			private static var iter:int = 0;
+			private static var algoOn:Boolean = false;
+			
 			protected function onCreationCompleate(event:FlexEvent):void
 			{
 				field  = new Field();
@@ -34,6 +36,7 @@
 			protected function finishMove(event:TurnEvent):void
 			{
 				lineAdded(event.line);
+				
 				//trace("added : ",event.line.model.i,event.line.model.j,event.line.model.isVertical);
 				if(checkedBox)
 				{
@@ -42,12 +45,43 @@
 				{
 					Constants.turn = !Constants.turn;
 				}
+				
 				iter++;
 				if(Constants.turn)
 				{
 					var emptyLines:Array = AlgoUtils.checkForEmptyLines(fieldModel);
-					algo.algorithm2(fieldModel,2,-161000,10000,Constants.turn,emptyLines);
-					var line:LineModel = algo.rightMove;
+					var line:LineModel = event.line.model;
+					
+					if(iter>10)//lineIsThreat(event.line.model))
+					{
+						algoOn = true;
+					}
+					if(algoOn)
+					{
+						algo.algorithm2(fieldModel,Constants.ALGO_DEPTH,-11000,10000,Constants.turn,emptyLines);
+						line = algo.rightMove;
+					}
+					else
+					{
+						line = getRandomMove(emptyLines);
+						if(algoOn)
+						{
+							algo.algorithm2(fieldModel,Constants.ALGO_DEPTH,-11000,10000,Constants.turn,emptyLines);
+							line = algo.rightMove;
+						}
+					
+					}
+					
+					
+//					if(fieldHasThreat(fieldModel))
+//					{
+//						algo.algorithm2(fieldModel,Constants.ALGO_DEPTH,-11000,10000,Constants.turn,emptyLines);
+//						line = algo.rightMove;
+//					}
+//					else
+//					{
+//						line = AlgoUtils.getRandomMove(fieldModel.copy());
+//					}
 					trace(line.i,line.j,line.isVertical);
 					//trace(algo.rightMove.i,algo.rightMove.j,algo.rightMove.isVertical);
 					//line.onClick(null);
@@ -149,7 +183,56 @@
 			}
 			
 
+			public function lineIsThreat(line:LineModel):Boolean
+			{
+				var lines:Array = AlgoUtils.checkBoxForEmptyLines(line.i, line.j, fieldModel);
+				if(!lines || lines.length < 2 )
+				{
+					return true;
+				}
+				if(line.isVertical)
+				{
+					if(line.j>0)
+					{
+						lines = AlgoUtils.checkBoxForEmptyLines(line.i, line.j-1, fieldModel);
+					}
+				}else
+				{
+					if(line.i>0)
+					{
+						lines = AlgoUtils.checkBoxForEmptyLines(line.i, line.j-1, fieldModel);
+					}
+				}
+				
+				if(lines && lines.length > 1 )
+				{
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
 			
+			
+			public function getRandomMove(moves:Array):LineModel
+			{
+				var move:LineModel;
+				
+				if(moves)
+				{
+					for each(var line:LineModel in moves)
+					{
+						if(!lineIsThreat(line))
+						{
+							return line;
+						}
+					}
+				}
+				algoOn = true;
+				return null;
+				
+			}
 			
 			
 			
